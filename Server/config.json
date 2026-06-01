@@ -1,0 +1,24 @@
+{
+    "server": {
+        "port": 4840,
+        "securityMode": "SignAndEncrypt",
+        "securityPolicy": "basic256sha256",
+        "autoAcceptUntrustedCertificates": false
+    },
+    "security": {
+        "description": "OPC UA Server Security Configuration",
+        "modes": {
+            "None": "Keine Nachrichtenverschlüsselung (unsicher)",
+            "Sign": "Nachrichten sind signiert (Integritätsprüfung)",
+            "SignAndEncrypt": "Nachrichten sind signiert und verschlüsselt (empfohlen)"
+        },
+        "policies": {
+            "none": "Keine Sicherheitsrichtlinie",
+            "basic128rsa15": "Deprecated - nicht empfohlen",
+            "basic256": "Alte Sicherheitsrichtlinie",
+            "basic256sha256": "Empfohlen",
+            "aes128sha256rsaoaep": "Modernes Verschlüsselungsverfahren",
+            "aes256sha256rsapss": "Modernes Verschlüsselungsverfahren mit AES256"
+        }
+    }
+}
