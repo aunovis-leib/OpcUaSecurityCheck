@@ -1,0 +1,49 @@
+name: .NET CI
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore Client/SecurityCheck.csproj
+          dotnet restore SecurityCheckGui/SecurityCheckGui.csproj
+          dotnet restore Server/SecurityCheckServer.csproj
+
+      - name: Build projects
+        run: |
+          dotnet build Client/SecurityCheck.csproj --configuration Release --no-restore
+          dotnet build SecurityCheckGui/SecurityCheckGui.csproj --configuration Release --no-restore
+          dotnet build Server/SecurityCheckServer.csproj --configuration Release --no-restore
+
+      - name: Run tests (if present)
+        shell: pwsh
+        run: |
+          $testProjects = Get-ChildItem -Path . -Recurse -Filter "*Test*.csproj" |
+            Where-Object { $_.FullName -notmatch "(bin|obj)" }
+
+          if (-not $testProjects) {
+            Write-Host "No test projects found. Skipping test execution."
+            exit 0
+          }
+
+          foreach ($project in $testProjects) {
+            Write-Host "Running tests for $($project.FullName)"
+            dotnet test $project.FullName --configuration Release --no-build
+          }
